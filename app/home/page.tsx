@@ -5,6 +5,9 @@ import { NormalForm } from "./components/1-normal";
 import { FormWithArray } from "./components/2-array";
 import FormWithWrapper from "./components/3-with-form-wrapper";
 import ArrayFormWithWrapper from "./components/4-array-with-form-wrapper";
+import { CardDialog } from "./components/CardDialog";
+import { CustomCard } from "./components/CustomCard";
+import { CustomDialog } from "./components/CustomDialog";
 
 // const options: string[] = [];
 
@@ -37,6 +40,10 @@ export default function Home() {
         {currentTab === "array-wrapper" && (
           <ArrayFormWithWrapper editingUser={null} />
         )}
+
+        <CustomDialog />
+        <CardDialog />
+        <CustomCard />
       </div>
     </>
   );
