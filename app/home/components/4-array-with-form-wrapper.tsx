@@ -50,12 +50,7 @@ export default function ArrayFormWithWrapper({
       onSubmit={onSubmit}
       style={{ padding: "20px" }}
     >
-      <Form.Input
-        control={methods.control}
-        name="name"
-        label="Name"
-        info="Some text"
-      />
+      <Form.Input control={methods.control} name="name" label="Name" />
 
       <FormLabel label="Projects" />
       {fields.map((field, index) => (
@@ -66,7 +61,6 @@ export default function ArrayFormWithWrapper({
           <Form.Select
             control={methods.control}
             name={`projects.${index}.id`}
-            helpText={"Max 20 chars, min 10. Only alphanumeric"}
             options={projects}
           />
           {fields.length > 1 && (
