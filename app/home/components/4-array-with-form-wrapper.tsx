@@ -2,13 +2,13 @@
 
 import { Form } from "@/app/components/Form";
 import { ArrayUser, projects } from "@/app/utils/form";
-import { ButtonV3 } from "@cecoc/ui-kit-v3";
+import { ButtonV3, FormLabel } from "@cecoc/ui-kit-v3";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import {
-    CreateArrayUserSchemaType,
-    useGetCreateArrayUserSchema,
+  CreateArrayUserSchemaType,
+  useGetCreateArrayUserSchema,
 } from "../schema";
 
 export default function ArrayFormWithWrapper({
@@ -44,15 +44,20 @@ export default function ArrayFormWithWrapper({
   }, [editingUser, methods]);
 
   return (
-    <Form methods={methods} onSubmit={onSubmit}>
+    <Form
+      methods={methods}
+      schema={useGetCreateArrayUserSchema()}
+      onSubmit={onSubmit}
+      style={{ padding: "20px" }}
+    >
       <Form.Input
         control={methods.control}
         name="name"
         label="Name"
-        helpText={"Max 20 chars, min 10. Only alphanumeric"}
-        mandatory
+        info="Some text"
       />
 
+      <FormLabel label="Projects" />
       {fields.map((field, index) => (
         <div
           key={field.id}
@@ -63,7 +68,6 @@ export default function ArrayFormWithWrapper({
             name={`projects.${index}.id`}
             helpText={"Max 20 chars, min 10. Only alphanumeric"}
             options={projects}
-            mandatory
           />
           {fields.length > 1 && (
             <ButtonV3 type="button" size="S" onClick={() => remove(index)}>

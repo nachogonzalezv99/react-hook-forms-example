@@ -1,0 +1,27 @@
+.tab {
+  color: var(--theme-body-text-medium);
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0px 12px;
+  height: 30px;
+  border: none;
+  background-color: unset;
+  cursor: pointer;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+}
+
+.tab:hover {
+  color: var(--main-color-primary);
+}
+
+.tab:disabled {
+  color: var(--theme-body-text-disabled);
+  cursor: not-allowed;
+}
+
+.tab[data-state="active"] {
+  color: red;
+}
