@@ -1,8 +1,6 @@
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { ComponentProps } from "react";
 
-
-
 const Card = function CardContent({
   children,
   style,
@@ -15,8 +13,8 @@ const Card = function CardContent({
         backgroundColor: "white",
         borderRadius: "0.375rem", // equivalent to rounded-md
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // equivalent to shadow-md
-        maxHeight: "80vh",
-        minHeight: "15rem",
+        // maxHeight: "80vh",
+        // minHeight: "15rem",
         maxWidth: "50rem",
         minWidth: "20rem",
         zIndex: 50,

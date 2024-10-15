@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cecoc/ui-kit-v3": "^2.9.55",
+    "@cecoc/icons": "^1.21.5",
+    "@cecoc/ui-kit-v3": "^2.24.10",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-dialog": "^1.1.1",
+    "classnames": "^2.5.1",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18",

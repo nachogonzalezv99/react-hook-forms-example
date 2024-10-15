@@ -13,7 +13,7 @@ import styles from "./Tabs.module.css";
 
 interface TabsContextProps<T> {
   onTabChange: (arg: T) => void;
-  selected: T | null;
+  currentTab: T | null;
 }
 
 const TabsContext = createContext<TabsContextProps<any> | null>(null);
@@ -27,12 +27,12 @@ interface TabsProviderProps<T> extends TabsContextProps<T> {
   children: ReactNode;
 }
 export function TabsProvider<T>({
-  selected,
+  currentTab,
   onTabChange,
   children,
 }: TabsProviderProps<T>) {
   return (
-    <TabsContext.Provider value={{ selected, onTabChange }}>
+    <TabsContext.Provider value={{ currentTab, onTabChange }}>
       {children}
     </TabsContext.Provider>
   );
@@ -42,61 +42,110 @@ export interface TabsProps<T>
   extends TabsContextProps<T>,
     ComponentProps<"div"> {
   options: TabOptions<T>;
+  variant?: "tab" | "button";
 }
 
 export function Tabs<T extends string>({
   onTabChange,
-  selected,
+  currentTab,
   options,
+  variant = "tab",
   ...props
 }: TabsProps<T>) {
   return (
-    <TabsProvider onTabChange={onTabChange} selected={selected}>
+    <TabsProvider onTabChange={onTabChange} currentTab={currentTab}>
       <div style={{ display: "flex" }} {...props}>
-        <Tabs.Items options={options} />
+        {options.map((option) =>
+          variant === "tab" ? (
+            <Tabs.TabItem
+              key={isTabOption(option) ? option.value : option}
+              value={isTabOption(option) ? option.value : option}
+              disabled={isTabOption(option) ? option.disabled : false}
+              prefix={isTabOption(option) ? option.prefix : false}
+              sufix={isTabOption(option) ? option.sufix : false}
+            >
+              {isTabOption(option) ? option.label : option}
+            </Tabs.TabItem>
+          ) : (
+            <Tabs.ButtonItem
+              key={isTabOption(option) ? option.value : option}
+              value={isTabOption(option) ? option.value : option}
+              disabled={isTabOption(option) ? option.disabled : false}
+              prefix={isTabOption(option) ? option.prefix : false}
+              sufix={isTabOption(option) ? option.sufix : false}
+            >
+              {isTabOption(option) ? option.label : option}
+            </Tabs.ButtonItem>
+          )
+        )}
       </div>
     </TabsProvider>
   );
 }
 
-interface TagItemProps<T> extends Omit<ComponentProps<"button">, "value"> {
+interface TagItemProps<T>
+  extends Omit<ComponentProps<"button">, "value" | "sufix" | "prefix"> {
   value: T;
+  prefix?: ReactNode;
+  sufix?: ReactNode;
 }
 
-Tabs.Items = function TabItem<T extends string>({
-  options,
-}: {
-  options: TabOptions<T>;
-}) {
-  return options.map((option) => (
-    <Tabs.Item
-      key={isTabOption(option) ? option.value : option}
-      value={isTabOption(option) ? option.value : option}
-      disabled={isTabOption(option) ? option.disabled : false}
-    >
-      {isTabOption(option) ? option.label : option}
-    </Tabs.Item>
-  ));
-};
-
-Tabs.Item = function TabItem<T>({
+Tabs.TabItem = function TabItem<T>({
   value,
   children,
+  prefix,
+  sufix,
   ...props
 }: TagItemProps<T>) {
-  const { selected, onTabChange } = useTabs<T>();
+  const { currentTab, onTabChange } = useTabs<T>();
 
   return (
     <>
       <button
         role="tab"
-        data-state={selected === value ? "active" : "inactive"}
+        data-state={currentTab === value ? "active" : "inactive"}
         className={styles.tab}
         onClick={() => onTabChange(value)}
         {...props}
       >
-        {children}
-        {selected === value && (
+        {prefix} {children} {sufix}
+        {currentTab === value && (
+          <span
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "2px",
+              backgroundColor: ColorsV3.mainColor.primary,
+            }}
+          />
+        )}
+      </button>
+    </>
+  );
+};
+
+Tabs.ButtonItem = function TabItem<T>({
+  value,
+  children,
+  prefix,
+  sufix,
+  ...props
+}: TagItemProps<T>) {
+  const { currentTab, onTabChange } = useTabs<T>();
+
+  return (
+    <>
+      <button
+        role="tab"
+        data-state={currentTab === value ? "active" : "inactive"}
+        className={styles.button}
+        onClick={() => onTabChange(value)}
+        {...props}
+      >
+        {prefix} {children} {sufix}
+        {currentTab === value && (
           <span
             style={{
               position: "absolute",
@@ -117,6 +166,8 @@ export interface TabOption<T> {
   value: T;
   label: string;
   disabled?: boolean;
+  prefix?: ReactNode;
+  sufix?: ReactNode;
 }
 
 type ExtractValue<T> = T extends TabOption<infer U> ? U : T;
@@ -175,7 +226,7 @@ export function useHandleTabs<Tab>(
     defaultSelected
   );
 
-  const changeTab = useCallback(
+  const onTabChange = useCallback(
     (value: ExtractValue<Tab>) => {
       if (queryKey) {
         const params = new URLSearchParams(searchParams);
@@ -189,11 +240,11 @@ export function useHandleTabs<Tab>(
   );
 
   useEffect(() => {
-    if (currentTab) changeTab(currentTab);
+    if (currentTab) onTabChange(currentTab);
     else replace(pathname!);
-  }, [currentTab, changeTab, pathname, replace]);
+  }, [currentTab, onTabChange, pathname, replace]);
 
-  return { currentTab, changeTab };
+  return { currentTab, onTabChange, options };
 }
 
 function isTabOption<T>(opts: TabOption<T> | T): opts is TabOption<T> {

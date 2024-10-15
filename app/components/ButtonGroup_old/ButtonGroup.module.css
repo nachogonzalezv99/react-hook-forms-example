@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  overflow: hidden;
+}
+
+.button {
+  min-width: 88px;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  color: var(--theme-body-text-medium);
+  background-color: var(--base-white);
+  gap: 8px;
+  font-weight: 500;
+}
+.button:disabled {
+  cursor: not-allowed;
+}
+.button:hover {
+  color: var(--base-white);
+  background-color: var(--main-color-primary);
+  border: none;
+}
+/* Border styles based on the index of the button */
+.buttonFirst {
+  border-radius: 10px 0 0 10px;
+  border: 1.5px solid #ccc;
+  border-right: none;
+}
+
+.buttonLast {
+  border-radius: 0 10px 10px 0;
+  border: 1.5px solid #ccc;
+  border-left: none;
+}
+
+.buttonMiddle {
+  border: 1.5px solid #ccc;
+  border-left: none;
+  border-right: none;
+}
+
+.buttonHovered {
+  background-color: #e0e0e0;
+  border-color: transparent;
+}
+
+.buttonNearActive,
+.buttonNearHovered {
+  border-right: none;
+}
+
+.button.buttonActive {
+  color: var(--base-white);
+  background-color: var(--main-color-primary);
+  border: none;
+}
+
+.sizeS {
+  padding: 6px 20px;
+  line-height: 21px;
+}
+
+.sizeM {
+  padding: 8px 25px;
+  line-height: 24px;
+}

@@ -1,0 +1,119 @@
+.iconButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--border-radius-s);
+  gap: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border: none;
+}
+
+.icon svg {
+  color: var(--theme-body-text-dark);
+}
+
+.iconButtonSmall {
+  width: 36px;
+  height: 36px;
+}
+
+.iconButtonPrimary {
+  background-color: var(--main-color-primary);
+}
+
+.iconPrimary svg {
+  color: var(--base-white);
+}
+
+.iconButtonSecondary {
+  background-color: var(--main-color-secondary);
+}
+
+.iconSecondary svg {
+  color: var(--theme-body-text-dark);
+}
+
+.iconButtonOutlinePrimary {
+  background-color: var(--base-white);
+  border: 1.5px solid var(--main-color-primary);
+}
+
+.iconButtonOutlinePrimary:hover,
+.iconButtonOutlinePrimary:active {
+  border: 1.5px solid var(--main-color-primary-accent);
+}
+
+.iconButtonOutlineSecondary {
+  background-color: var(--base-white);
+  border: 1.5px solid var(--main-color-secondary-accent);
+}
+
+.iconButtonOutlineSecondary:hover,
+.iconButtonOutlineSecondary:active {
+  border: 1.5px solid var(--theme-body-text-medium);
+}
+
+.iconButtonNoSquare {
+  background-color: transparent;
+  border: none;
+}
+
+.iconNoSquare svg {
+  color: var(--theme-body-text-dark);
+}
+
+.iconButtonNoSquare:not(.iconButtonDisabled) .iconNoSquare:hover svg,
+.iconButtonNoSquare:not(.iconButtonDisabled) .iconNoSquare:active svg {
+  color: var(--main-color-primary-accent);
+}
+
+.iconButton:focus {
+  outline: none;
+}
+
+.iconButtonPrimary:active {
+  background-color: var(--main-color-primary-accent);
+}
+
+.iconButtonSecondary:active {
+  background-color: var(--main-color-secondary-accent);
+}
+
+.iconButtonPrimary:not(.iconButtonDisabled):hover,
+.iconButtonSecondary:not(.iconButtonDisabled):hover {
+  box-shadow: 0px 1px 3px 1px rgba(62, 66, 70, 0.25);
+}
+
+/* TODO: Add focus state for all buttons */
+/* .iconButton:focus {
+    box-shadow: 0px 0px 0px 4px rgba(213, 0, 0, 0.5);
+  }
+  
+  .iconButtonSecondary:focus {
+    box-shadow: 0px 0px 0px 4px rgba(181, 189, 197, 0.5);
+  }
+  
+  .iconButtonNonSquare:focus {
+    border: 1.5px solid var(--main-color-primary-accent);
+    box-shadow: none;
+  }   */
+
+.iconButtonDisabled {
+  cursor: not-allowed;
+}
+
+.iconDisabled svg {
+  color: var(--theme-background-disabled);
+}
+
+:not(.iconButtonNoSquare).iconButtonDisabled {
+  background-color: var(--theme-background-disabled);
+  border: none;
+}
+
+:not(.iconNoSquare).iconDisabled svg {
+  color: var(--theme-body-text-disabled);
+}

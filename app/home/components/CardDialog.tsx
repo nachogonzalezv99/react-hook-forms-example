@@ -9,7 +9,7 @@ export function CardDialog() {
         <ButtonV3>Card dialog</ButtonV3>
       </Dialog.Trigger>
       <Dialog.Content>
-        <Card>
+        <Card style={{ maxHeight: "80vh", minHeight: "15rem" }}>
           <Card.Header>Hola</Card.Header>
           <Card.Body>
             {Array.from({ length: 5 }).map((_, index) => (

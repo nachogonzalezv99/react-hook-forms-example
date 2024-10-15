@@ -47,9 +47,7 @@ export function NormalForm({ editingUser }: { editingUser: User | null }) {
         render={({ field }) => (
           <InputV3
             label="Name"
-            helpText={
-              errors.name?.message || "Max 20 chars, min 10. Only alphanumeric"
-            }
+            helpText={errors.name?.message}
             error={Boolean(errors.name)}
             mandatory
             {...field}
@@ -62,9 +60,7 @@ export function NormalForm({ editingUser }: { editingUser: User | null }) {
         render={({ field }) => (
           <InputV3
             label="Email"
-            helpText={
-              errors.email?.message || "Max 20 chars, min 10. Only alphanumeric"
-            }
+            helpText={errors.email?.message}
             error={Boolean(errors.email)}
             mandatory
             {...field}
@@ -78,10 +74,7 @@ export function NormalForm({ editingUser }: { editingUser: User | null }) {
         render={({ field }) => (
           <SelectTextV3
             label="Email"
-            helpText={
-              errors.country?.message ||
-              "Max 20 chars, min 10. Only alphanumeric"
-            }
+            helpText={errors.country?.message}
             error={Boolean(errors.country)}
             mandatory
             options={[

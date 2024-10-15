@@ -1,0 +1,28 @@
+.absoluteContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+}
+
+.absoluteItem {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background-color: lightblue;
+  border: 1px solid #000;
+  transition: 0.3s ease top;
+  animation: moveLeft 0.3s ease;
+}
+
+@keyframes moveLeft {
+  0% {
+    transform: translateX(-400px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

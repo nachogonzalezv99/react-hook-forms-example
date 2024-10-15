@@ -63,6 +63,7 @@ export default function ArrayFormWithWrapper({
             name={`projects.${index}.id`}
             options={projects}
           />
+
           {fields.length > 1 && (
             <ButtonV3 type="button" size="S" onClick={() => remove(index)}>
               Delete

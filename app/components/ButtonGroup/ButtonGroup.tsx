@@ -1,424 +1,193 @@
-import { BorderRadius, ColorsV3 } from "@cecoc/ui-kit-v3";
-import React, {
-  ButtonHTMLAttributes,
-  CSSProperties,
-  ReactNode,
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  createContext,
+  useCallback,
+  useContext,
   useEffect,
   useState,
+  type ComponentProps,
+  type ReactNode,
 } from "react";
 import styles from "./ButtonGroup.module.css";
 
-type Size = "S" | "M";
-
-export interface ButtonGroupProps extends ButtonHTMLAttributes<HTMLDivElement> {
-  /**
-   * The ButtonGroup template
-   */
-  template: ButtonGroupTemplate[];
-
-  /**
-   * The selected option (Id of the selected button)
-   */
-  selected?: string;
-
-  /**
-   * The Component size
-   */
-  size?: Size;
-
-  /**
-   * The selected option (Id of the selected button)
-   */
-  onChangeActive: (id: string) => void;
-
-  /**
-   * Id for testing propouses
-   */
-  dataTestId?: string;
+interface TabsContextProps<T> {
+  onTabChange: (arg: T) => void;
+  currentTab: T | null;
 }
 
-export interface ButtonGroupTemplate {
-  /**
-   * The id for the button
-   */
-  id: string;
+const TabsContext = createContext<TabsContextProps<any> | null>(null);
 
-  /**
-   * The text for the button
-   */
-  label: string;
-  /**
-   * Icon or Node for the left side
-   */
-  preffix?: ReactNode;
-
-  /**
-   * Icon or Node for the right side
-   */
-  suffix?: ReactNode;
+function useTabs<T>() {
+  const context = useContext(TabsContext) as TabsContextProps<T> | null;
+  if (!context) throw new Error("useTabs must be used inside a TabsProvider");
+  return context;
+}
+interface TabsProviderProps<T> extends TabsContextProps<T> {
+  children: ReactNode;
+}
+export function TabsProvider<T>({
+  currentTab,
+  onTabChange,
+  children,
+}: TabsProviderProps<T>) {
+  return (
+    <TabsContext.Provider value={{ currentTab, onTabChange }}>
+      {children}
+    </TabsContext.Provider>
+  );
 }
 
-export const ButtonGroup = ({
-  template,
-  selected,
-  dataTestId,
-  onChangeActive,
-  size = "M",
-  style,
-}: ButtonGroupProps) => {
-  const [hovered, setHovered] = useState<string | null>(null);
-  const handleHovered = (id: string) => {
-    setHovered(id);
-  };
+export interface TabsProps<T>
+  extends TabsContextProps<T>,
+    ComponentProps<"div"> {
+  options: TabOptions<T>;
+}
+
+export function ButtonGroup<T extends string>({
+  onTabChange,
+  currentTab,
+  options,
+  ...props
+}: TabsProps<T>) {
+  return (
+    <TabsProvider onTabChange={onTabChange} currentTab={currentTab}>
+      <div className={styles.container} {...props}>
+        <ButtonGroup.Items options={options} />
+      </div>
+    </TabsProvider>
+  );
+}
+
+interface TagItemProps<T> extends Omit<ComponentProps<"button">, "value"> {
+  value: T;
+}
+
+ButtonGroup.Items = function TabItem<T extends string>({
+  options,
+}: {
+  options: TabOptions<T>;
+}) {
+  return options.map((option) => (
+    <ButtonGroup.Item
+      key={isTabOption(option) ? option.value : option}
+      value={isTabOption(option) ? option.value : option}
+      disabled={isTabOption(option) ? option.disabled : false}
+    >
+      {isTabOption(option) ? option.label : option}
+    </ButtonGroup.Item>
+  ));
+};
+
+ButtonGroup.Item = function ButtonItem<T>({
+  value,
+  children,
+  ...props
+}: TagItemProps<T>) {
+  const { currentTab, onTabChange } = useTabs<T>();
 
   return (
-    <div data-testid={dataTestId} className={styles.container} style={style}>
-      {template.map((item, index) => {
-        const { label, id, ...props } = item;
-        let style = {};
-        let nearActive = {
-          left: false,
-          right: false,
-        };
-        let nearHovered = {
-          left: false,
-          right: false,
-        };
-        if (index === 0 && index === template.length - 1) {
-          style = { borderRadius: BorderRadius.XL };
-        } else if (index === 0) {
-          style = { borderRadius: `${BorderRadius.XL} 0 0 ${BorderRadius.XL}` };
-          if (template[index + 1] && template[index + 1].id === selected) {
-            nearActive = {
-              left: false,
-              right: true,
-            };
-          }
-          if (template[index + 1] && template[index + 1].id === hovered) {
-            nearHovered = {
-              left: false,
-              right: true,
-            };
-          }
-        } else if (index === template.length - 1) {
-          style = { borderRadius: `0 ${BorderRadius.XL} ${BorderRadius.XL} 0` };
-          if (template[index - 1] && template[index - 1].id === selected) {
-            nearActive = {
-              left: true,
-              right: false,
-            };
-          }
-          if (template[index - 1] && template[index - 1].id === hovered) {
-            nearHovered = {
-              left: true,
-              right: false,
-            };
-          }
-        } else {
-          if (template[index - 1] && template[index - 1].id === selected) {
-            nearActive = {
-              left: true,
-              right: false,
-            };
-          } else if (
-            template[index + 1] &&
-            template[index + 1].id === selected
-          ) {
-            nearActive = {
-              left: false,
-              right: true,
-            };
-          }
-
-          if (template[index - 1] && template[index - 1].id === hovered) {
-            nearHovered = {
-              left: true,
-              right: false,
-            };
-          } else if (
-            template[index + 1] &&
-            template[index + 1].id === hovered
-          ) {
-            nearHovered = {
-              left: false,
-              right: true,
-            };
-          }
-        }
-
-        return (
-          <ButtonBase
-            size={size}
-            active={selected === id}
-            id={id}
-            key={"ButtonBase" + index}
-            style={style}
-            index={index}
-            nearActive={nearActive}
-            totalItems={template.length}
-            {...props}
-            activate={() => onChangeActive(id)}
-            dataTestId={`button-${index}`}
-            hovered={hovered === id}
-            handleHovered={handleHovered}
-            nearHovered={nearHovered}
-          >
-            {label}
-          </ButtonBase>
-        );
-      })}
-    </div>
+    <>
+      <button
+        role="tab"
+        data-state={currentTab === value ? "active" : "inactive"}
+        className={styles.button}
+        onClick={() => onTabChange(value)}
+        {...props}
+      >
+        {children}
+      </button>
+    </>
   );
 };
 
-ButtonGroup.displayName = "ButtonGroup";
-
-interface ButtonBaseProps {
-  /**
-   * The Button id
-   */
-  id: string;
-  /**
-   * The Button status
-   */
+export interface TabOption<T> {
+  value: T;
+  label: string;
   disabled?: boolean;
-  /**
-   * The button size
-   */
-  size?: Size;
-  /**
-   * Icon or Node for the left side
-   */
-  preffix?: ReactNode;
-
-  /**
-   * Icon or Node for the right side
-   */
-  suffix?: ReactNode;
-
-  /**
-   * The Button width, can be either a number or a string.
-   */
-  width?: number | string;
-
-  /**
-   * Is active the option
-   */
-  active?: boolean;
-
-  /**
-   * The Button style
-   */
-  style?: CSSProperties;
-
-  /**
-   * The Button children
-   */
-  children?: ReactNode;
-
-  /**
-   * The Button onClick event
-   */
-  activate?: (id: string) => void;
-
-  /**
-   * The index of the button
-   */
-  index: number;
-
-  /**
-   * The total of items
-   */
-  totalItems: number;
-
-  /**
-   * The near active option
-   */
-  nearActive?: {
-    left: boolean;
-    right: boolean;
-  };
-
-  /**
-   * Id for testing propouses
-   */
-  dataTestId?: string;
-
-  /**
-   * The hovered status
-   */
-  hovered: boolean;
-
-  /**
-   * Handle hovered event
-   */
-  handleHovered: (id: string) => void;
-
-  /**
-   * The near hovered option
-   */
-  nearHovered?: {
-    left: boolean;
-    right: boolean;
-  };
 }
 
-const ButtonBase = ({
-  id,
-  active = false,
-  disabled = false,
-  preffix,
-  suffix,
-  size = "M",
-  width = "auto",
-  style,
-  index,
-  totalItems,
-  children,
-  nearActive,
-  activate,
-  dataTestId,
-  hovered,
-  handleHovered,
-  nearHovered,
-}: ButtonBaseProps) => {
-  const [iconColor, setIconColor] = useState(ColorsV3.themeBodyText.medium);
+type ExtractValue<T> = T extends TabOption<infer U> ? U : T;
+type TabOptions<T> = readonly T[] | readonly TabOption<T>[];
 
-  // Styles for the button
-  const stylesButton: CSSProperties = {
-    width: width,
-    // minWidth: "88px",
-    // display: "flex",
-    // justifyContent: "center",
-    // flexGrow: 1,
-    // alignItems: "center",
-    // boxSizing: "border-box",
-    // cursor: disabled ? "not-allowed" : "pointer",
-    // color: active ? ColorsV3.base.white : ColorsV3.themeBodyText.medium,
-    // backgroundColor: active ? ColorsV3.mainColor.primary : ColorsV3.base.white,
-    ...setBorder(index, totalItems, active, hovered, nearActive, nearHovered),
-    // gap: "8px",
-    // fontWeight: "500",
-    ...style,
-  };
+function getCurrentTab<T>(
+  options: TabOptions<T>,
+  selected: ExtractValue<T> | null,
+  defaultSelected?: boolean
+): ExtractValue<T> | null {
+  if (options.length === 0) return null;
+  if (isTabOptionArray(options)) {
+    if (options.find((a) => a.value === selected && !a.disabled)) {
+      return selected as ExtractValue<T>;
+    } else
+      return (defaultSelected as ExtractValue<T>)
+        ? (options.find((o) => !o.disabled)?.value as ExtractValue<T>) || null
+        : null;
+  } else {
+    if (options.find((a) => a === selected)) {
+      return selected as ExtractValue<T>;
+    } else return defaultSelected ? (options[0] as ExtractValue<T>) : null;
+  }
+}
 
-  // Styles for the text inside
-  const stylesText: CSSProperties = {
-    userSelect: "none",
-    fontSize: size == "M" ? "16px" : "14px",
-  };
+interface Config {
+  /**
+   * When using this option the selected tab will be stored as a query param in the url. For example setting queryKey=page will end up in www.mypage.com?page=[value].
+   * If options is not provided the value of the selection will be stored as a React state.
+   */
+  queryKey?: string;
+  /**
+   * By default is set to true. When is set to true it will select the first tab not disabled on page rendered. If all options are disabled no tab will be selected. If option is
+   * set to false no option will be selected by default.
+   */
+  defaultSelected?: boolean;
+  /**
+   * Scroll will move the scroll of the window to the beggining.
+   */
+  scroll?: boolean;
+}
+
+export function useHandleTabs<Tab>(
+  options: TabOptions<Tab>,
+  config: Config = {}
+) {
+  const { queryKey, defaultSelected = true, scroll = false } = config;
+  const [selected, setSelected] = useState<ExtractValue<Tab> | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams()!;
+  const { replace } = useRouter();
+
+  const currentTab = getCurrentTab<Tab>(
+    options,
+    queryKey ? (searchParams.get(queryKey) as ExtractValue<Tab>) : selected,
+    defaultSelected
+  );
+
+  const onTabChange = useCallback(
+    (value: ExtractValue<Tab>) => {
+      if (queryKey) {
+        const params = new URLSearchParams(searchParams);
+        params.set(queryKey, value as string);
+        replace(`${pathname}?${params.toString()}`, { scroll });
+      } else {
+        setSelected(value);
+      }
+    },
+    [queryKey, pathname, replace, searchParams, scroll]
+  );
 
   useEffect(() => {
-    setIconColor(active ? ColorsV3.base.white : ColorsV3.themeBodyText.medium);
-  }, [disabled, active]);
+    if (currentTab) onTabChange(currentTab);
+    else replace(pathname!);
+  }, [currentTab, onTabChange, pathname, replace]);
 
-  const handleOnClick = () => {
-    if (!disabled && !active && activate) {
-      activate(id);
-    }
-  };
-
-  return (
-    <div
-      style={stylesButton}
-      className={`${styles.button} 
-      ${active ? styles.buttonActive : ""} 
-      ${size === "S" ? styles.sizeS : styles.sizeM}
-      ${index === 0 ? styles.buttonFirst : ""}
-      ${index === totalItems - 1 ? styles.buttonLast : ""}
-      ${index !== 0 && index !== totalItems - 1 ? styles.buttonMiddle : ""}
-      ${hovered ? styles.buttonHovered : ""}`}
-      tabIndex={0}
-      onClick={handleOnClick}
-      data-testid={dataTestId}
-    >
-      {preffix
-        ? React.cloneElement(preffix as JSX.Element, {
-            width: "24px",
-            color: iconColor,
-          })
-        : ""}
-      <span style={stylesText}>{children}</span>
-      {suffix
-        ? React.cloneElement(suffix as JSX.Element, {
-            width: "24px",
-            color: iconColor,
-          })
-        : ""}
-    </div>
-  );
-};
-
-/**
- * This function calculates start styles based on size
- */
-function styleWithSize(size: Size): React.CSSProperties {
-  switch (size) {
-    case "S":
-      return {
-        padding: "6px 20px 6px 20px",
-        lineHeight: "21px",
-      };
-    case "M":
-      return {
-        padding: "8px 25px 8px 25px",
-        lineHeight: "24px",
-      };
-  }
+  return { currentTab, onTabChange, options };
 }
 
-/**
- * This function sets the border for the button
- */
-function setBorder(
-  index: number,
-  totalItems: number,
-  active: boolean,
-  hovered: boolean,
-  nearActive?: { left: boolean; right: boolean },
-  nearHovered?: { left: boolean; right: boolean }
-) {
-  const normalBorder = `1.5px solid ${ColorsV3.themeBodyText.medium}`;
-  const allBorders = { border: `1.5px solid ${ColorsV3.themeBodyText.medium}` };
-  const noSideBorders = {
-    borderTop: normalBorder,
-    borderRight: "1.5px solid transparent",
-    borderBottom: normalBorder,
-    borderLeft: "1.5px solid transparent",
-  };
-
-  const noLeftBorder = {
-    borderTop: normalBorder,
-    borderRight: normalBorder,
-    borderBottom: normalBorder,
-    borderLeft: "1.5px solid transparent",
-  };
-
-  const noRightBorder = {
-    borderTop: normalBorder,
-    borderRight: "1.5px solid transparent",
-    borderBottom: normalBorder,
-    borderLeft: normalBorder,
-  };
-
-  if (active || hovered) {
-    return {
-      border: "1.5px solid transparent",
-    };
-  } else {
-    if (index === totalItems - 1) {
-      if (nearActive?.left || nearHovered?.left) {
-        return noLeftBorder;
-      }
-      return allBorders;
-    } else {
-      if (nearActive?.left || nearHovered?.left) {
-        return noSideBorders;
-      }
-      if (nearActive?.right || nearHovered?.right) {
-        return noRightBorder;
-      }
-      return noRightBorder;
-    }
-  }
+function isTabOption<T>(opts: TabOption<T> | T): opts is TabOption<T> {
+  return (opts as TabOption<T>)?.label !== undefined;
+}
+function isTabOptionArray<T>(
+  opts: readonly TabOption<T>[] | readonly T[]
+): opts is readonly TabOption<T>[] {
+  return (opts as TabOption<T>[])[0]?.label !== undefined;
 }

@@ -3,6 +3,7 @@
   transition: color 0.3s ease;
   display: flex;
   align-items: center;
+  gap: 8px;
   position: relative;
   padding: 0px 12px;
   height: 30px;
@@ -24,4 +25,54 @@
 
 .tab[data-state="active"] {
   color: red;
+}
+
+/*Button*/
+.container {
+  display: flex;
+}
+.button {
+  color: var(--theme-body-text-medium);
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  cursor: pointer;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+
+  background-color: var(--base-white);
+  padding: 5px 10px;
+  border-left: 0.5px solid var(--theme-body-text-medium);
+  border-right: 0.5px solid var(--theme-body-text-medium);
+  border-top: 1px solid var(--theme-body-text-medium);
+  border-bottom: 1px solid var(--theme-body-text-medium);
+  overflow: hidden;
+}
+.button:first-child {
+  border-left: 1px solid var(--theme-body-text-medium);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.button:last-child {
+  border-right: 1px solid var(--theme-body-text-medium);
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.button:hover {
+  color: var(--base-white);
+  color: var(--main-color-primary);
+}
+
+.button:disabled {
+  color: var(--theme-body-text-disabled);
+  background-color: var(--theme-background-disabled);
+  cursor: not-allowed;
+}
+.button[data-state="active"] {
+  color: var(--base-white);
+  background-color: var(--main-color-primary);
+  border-color: var(--main-color-primary);
 }
